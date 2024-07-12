@@ -7,6 +7,8 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+
+helmetenv/
 .Python
 build/
 develop-eggs/
