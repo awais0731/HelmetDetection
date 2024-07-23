@@ -8,6 +8,10 @@ __pycache__/
 
 # Distribution / packaging
 
+logs/
+artifacts/
+
+
 helmetenv/
 .Python
 build/
