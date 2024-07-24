@@ -1,6 +1,7 @@
-from Helmet.entity.config_entity import DataIngestionConfig
-from Helmet.entity.artifacts_entity import DataIngestionArtifacts
+from Helmet.entity.config_entity import DataIngestionConfig, DataTransformationConfig
+from Helmet.entity.artifacts_entity import DataIngestionArtifacts, DataTransformationArtifacts
 from Helmet.components.data_ingestion import DataIngestion
+from Helmet.components.data_transformation import DataTransformation
 from Helmet.configuration.s3_operations import S3Operation
 from Helmet.logger import logging
 from Helmet.exception import HelmetException
@@ -10,6 +11,7 @@ class TrainPipeline:
 
     def __init__(self):
         self.data_ingestion_config = DataIngestionConfig()
+        self.data_transformation_config = DataTransformationConfig()
 
 
     
@@ -30,13 +32,38 @@ class TrainPipeline:
             raise HelmetException(e, sys) from e
         
 
+    
+    def start_data_transformation(self, data_ingestion_artifact: DataIngestionArtifacts) -> DataTransformationArtifacts:
 
+        logging.info("Entered the start_data_transformation method of TrainPipeline class")
+
+        try:
+            data_transformation = DataTransformation(
+                
+                data_ingestion_artifact=data_ingestion_artifact,
+                data_transformation_config=self.data_transformation_config,
+            )
+            data_transformation_artifact = (
+                data_transformation.initiate_data_transformation()
+            )
+            logging.info(
+                "Exited the start_data_transformation method of TrainPipeline class"
+            )
+            return data_transformation_artifact
+        except Exception as e:
+            raise HelmetException(e, sys)
     
     def run_pipeline(self) -> None:
 
         try:
 
             data_ingestion_artifact: DataIngestionArtifacts = self.start_data_ingestion()
+
+            data_transformation_artifact : DataTransformationArtifacts =(
+                self.start_data_transformation(
+                    data_ingestion_artifact=data_ingestion_artifact
+                )
+            )
 
             
             
